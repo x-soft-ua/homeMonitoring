@@ -1,0 +1,15 @@
+{
+    "name": "root/homeMonitoring",
+    "authors": [
+        {
+            "name": "x-soft-ua",
+            "email": "orstse@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "app\\": "app"
+        }
+    }
+}
