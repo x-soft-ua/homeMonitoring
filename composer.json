@@ -6,7 +6,9 @@
             "email": "orstse@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "ext-pdo_mysql": "*"
+    },
     "autoload": {
         "psr-4": {
             "app\\": "app"

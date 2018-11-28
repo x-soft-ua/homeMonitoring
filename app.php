@@ -4,6 +4,6 @@
 require(__DIR__ . '/vendor/autoload.php');
 
 
-$coreApp = new \app\Core();
+$coreApp = new \app\Boiler();
 $coreApp->init();
 
