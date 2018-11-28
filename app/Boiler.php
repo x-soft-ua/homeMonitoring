@@ -20,15 +20,6 @@ class Boiler extends Core
             'temp_out' => $tempOut
         ]);
         
-        echo date('[Y-m-d H:i:s]') . ' => ' . $tempOut . '[' . $status . ']' . PHP_EOL;
-        //$data = 
-
-
-//        $data = $dbh->query('SELECT * from temp_boiler')->fetchAll();
-//        print_r($data);
-////             foreach($dbh->query('SELECT * from temp_boiler') as $row) {
-////                 print_r($row);
-////             }
-//        $dbh = null;
+        //echo date('[Y-m-d H:i:s]') . ' => ' . $tempOut . '[' . $status . ']' . PHP_EOL;
     }
 }

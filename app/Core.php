@@ -7,6 +7,7 @@
  {
      const MYSQL_USER = 'grafana';
      const MYSQL_PASS = 'grafanapass';
+     const REFRESH_TIME = 5;
 
      /**
       * @var PDO
@@ -57,7 +58,7 @@
      {   
         while (true) {
             $this->execute();
-            sleep(1);
+            sleep(self::REFRESH_TIME);
         }
      }
      
