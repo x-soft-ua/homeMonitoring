@@ -15,10 +15,14 @@ class Boiler extends Core
             return;
         }
         
-        $stm = $this->getDb()->prepare('INSERT INTO ' . self::TABLE . ' (date, temp_out) VALUES (NOW(), :temp_out)');
-        $status = $stm->execute([
-            'temp_out' => $tempOut
-        ]);
+        if ($this->checkValue('boiler', $tempOut)) {
+            $stm = $this->getDb()->prepare('INSERT INTO ' . self::TABLE . ' (date, temp_out) VALUES (NOW(), :temp_out)');
+            $status = $stm->execute([
+                'temp_out' => $tempOut
+            ]);
+        } else {
+            echo 'Invalid value: ' . $tempOut . PHP_EOL;
+        }
         
         //echo date('[Y-m-d H:i:s]') . ' => ' . $tempOut . '[' . $status . ']' . PHP_EOL;
     }
