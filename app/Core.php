@@ -67,7 +67,7 @@
          $listKey = 'last_' . $key;
          $listLen = $this->redis->lLen($listKey);
          if ($listLen === false || $listLen <= self::COMPARE_LIST_LEN) {
-             $this->redis->lPush($listKey, $value);
+             $this->redis->rPush($listKey, $value);
              return $value;
          }
 
@@ -75,7 +75,7 @@
              ->multi()
              ->lRange($listKey, -1 * self::COMPARE_LIST_LEN, -1)
              ->lPop($listKey)
-             ->lPush($listKey, $value)
+             ->rPush($listKey, $value)
              ->exec();
 
          if (empty($lastValues[0])) {
@@ -94,7 +94,7 @@
              return false;
          }
 
-         $this->redis->lPush($listKey, $value);
+//         $this->redis->lPush($listKey, $value);
          return true;
      }
      
