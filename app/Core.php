@@ -29,10 +29,15 @@
       * @var string
       */
      private $url;
+
+     /**
+      * @var null|integer
+      */
+     protected $userRefreshTime = null;
      
      public function __construct()
      {
-         $this->url = $_SERVER['argv'][1] ?? 0;
+         $this->url = $_SERVER['argv'][2] ?? 0;
          if (empty($this->url)) {
              throw new \Exception('Url parameter not specified');
          }
@@ -44,6 +49,15 @@
              print "Error!: " . $e->getMessage() . "<br/>";
              die();
          }
+     }
+     
+     protected function getRefreshTime()
+     {
+         $this->userRefreshTime = (int)$this->userRefreshTime;
+         if (empty($this->userRefreshTime) || $this->userRefreshTime < 0) {
+             return self::REFRESH_TIME;
+         }
+         return $this->userRefreshTime;
      }
 
      /**
