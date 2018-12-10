@@ -23,7 +23,7 @@
      /**
       * @var \Redis
       */
-     private $redis;
+     protected $redis;
 
      /**
       * @var string
