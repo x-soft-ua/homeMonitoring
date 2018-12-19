@@ -5,28 +5,35 @@ namespace app;
 class Boiler extends Core
 {
 
+    protected $mqttTopic = 'boilerTemp';
+
     const TABLE = 'temp_boiler';
 
     const COLUMN_INSIDE = 'temp_inside';
     const COLUMN_OUTSIDE = 'temp_outside';
     const COLUMN_BOILER_OUT = 'temp_out';
+    const COLUMN_BOILER_IN = 'temp_in';
 
     private static $sensorMap = [
         self::COLUMN_INSIDE => 0,
-        self::COLUMN_BOILER_OUT => 2,
+        self::COLUMN_BOILER_OUT => 3,
+        self::COLUMN_BOILER_IN => 2,
         self::COLUMN_OUTSIDE => 1,
     ];
-
-    public function execute()
+    public function execute($topic = '', $msg = '')
     {
-        $tempJson = file_get_contents($this->getUrl());
+        //$tempJson = file_get_contents($this->getUrl());
+        $tempJson = $msg;
+        
+        echo $msg . PHP_EOL;
+        //return;
         if ($tempJson === false) {
             echo 'Invalid response from controller' . PHP_EOL;
             return;
         }
 
         $tempJsonArr = json_decode($tempJson, true);
-
+        
         $sensorsTemp = [];
         $invalidValues = false;
         foreach (self::$sensorMap as $column => $sensorId) {

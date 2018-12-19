@@ -3,6 +3,10 @@
  use PDO;
  use PDOException;
 
+ define('BROKER', 'localhost');
+ define('PORT', 1883);
+ define('CLIENT_ID', "pubclient_" + getmypid());
+ 
  abstract class Core
  {
      const MYSQL_USER = 'grafana';
@@ -34,10 +38,25 @@
       * @var null|integer
       */
      protected $userRefreshTime = null;
+
+
+     /**
+      * @var bool
+      */
+     private $useMqtt = false;
+
+     /**
+      * @var string
+      */
+     protected $mqttTopic = '';
      
      public function __construct()
      {
          $this->url = $_SERVER['argv'][2] ?? 0;
+         if ($this->url === 'mqtt' || !empty($this->mqttTopic)) {
+             $this->useMqtt = true;
+         }
+         
          if (empty($this->url)) {
              throw new \Exception('Url parameter not specified');
          }
@@ -79,6 +98,10 @@
      protected function checkValue($key, $value)
      {
          $listKey = 'last_' . $key;
+         if ($value == -127) {
+             return false;
+         }
+         
          $listLen = $this->redis->lLen($listKey);
          if ($listLen === false || $listLen <= self::COMPARE_LIST_LEN) {
              $this->redis->rPush($listKey, $value);
@@ -116,16 +139,38 @@
      protected function saveData(array $data)
      {
      }
+     
+     protected function initMqtt()
+     {
+         $client = new \Mosquitto\Client(CLIENT_ID);
+//        $client->onConnect('connect');
+//        $client->onDisconnect('disconnect');
+//        $client->onSubscribe('subscribe');
+         $client->onMessage(function ($message) {
+             if (!empty($this->mqttTopic) && $this->mqttTopic != $message->topic) {
+                 return;
+             }
+             $this->execute($message->topic, $message->payload);
+         });
+         $client->connect(BROKER, PORT, 60);
+         $client->subscribe('#', 1); // Subscribe to all messages
+
+         $client->loopForever();
+     }
 
      public function init()
-     {   
-        while (true) {
-            $this->execute();
-            sleep(self::REFRESH_TIME);
-        }
+     {
+         if ($this->useMqtt) {
+             $this->initMqtt();
+             return;
+         }
+         while (true) {
+             $this->execute();
+             sleep($this->getRefreshTime());
+         }
      }
      
      
-     abstract function execute();
+     abstract function execute($topic = '', $msg = '');
  }
 

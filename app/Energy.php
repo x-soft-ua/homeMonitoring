@@ -21,9 +21,10 @@ class Energy extends Core
     
     protected $userRefreshTime = 15;
 
-    public function execute()
+    public function execute($topic = '', $msg = '')
     {
         $tempJson = file_get_contents($this->getUrl());
+        echo date('Y-m-d H:i:s') . ": $tempJson\n"; 
         if ($tempJson === false) {
             echo 'Invalid response from controller' . PHP_EOL;
             return;

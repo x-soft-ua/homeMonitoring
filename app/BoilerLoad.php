@@ -2,43 +2,46 @@
 
 namespace app;
 
+use Bluerhinos\phpMQTT;
+use karpy47\PhpMqttClient\MQTTClient;
+
 class BoilerLoad extends Core
 {
 
     const TABLE = 'boiler_load';
 
-    const VALUES_COMPARE_LEN = 6;
+    const VALUES_COMPARE_LEN = 15;
+    const MIDDLE = 7;
     
-    const MAX = 81;
+    const MAX = 80;
     const MIN = 0;
+    
 
-    protected $userRefreshTime = 15;
+    protected $userRefreshTime = 10;
+    protected $mqttTopic = 'boilerLoad';
 
 
-    public function execute()
+    /**
+     * @param string $topic
+     * @param string $msg
+     * @return bool|void
+     */
+    public function execute($topic = '', $msg = '')
     {
+        return;
+        
         try {
             $stm = $this->getDb()->query('SELECT temp_out FROM temp_boiler ORDER BY date DESC LIMIT 1');
             if ($stm) {
                 $curTemp = $stm->fetchColumn(0);
             }
         } catch (\Exception $e) {}
-        if (empty($curTemp) || $curTemp < 50) {
-            //echo 'Low temperature' . PHP_EOL;
+        if (empty($curTemp) || $curTemp < 45) {
+            echo 'Low temperature: ' . $curTemp . PHP_EOL;
             return;            
         }
-        
-        $tempJson = file_get_contents($this->getUrl());
-        
-        echo $tempJson . PHP_EOL;
-        if ($tempJson === false) {
-            echo 'Invalid response from controller' . PHP_EOL;
-            return;
-        }
-
-        $tempJsonArr = json_decode($tempJson, true);
-
-        $value = $tempJsonArr[0];
+  
+        $value = (float)$msg;
 
 
         $listKey = 'boiler_load';
@@ -56,16 +59,15 @@ class BoilerLoad extends Core
             ->exec();
 
         if (empty($lastValues[0])) {
-            return false;
+            return;
         }
-        $avg = 0;
-        foreach ($lastValues[0] as $lastValue) {
-            $avg += $lastValue;
-        }
+        
+        sort($lastValues[0]);
+        $valuesMap = $lastValues[0];
+        $avg = $valuesMap[self::MIDDLE];
 
-        $avg = $avg / self::COMPARE_LIST_LEN;
-
-
+        echo $avg . PHP_EOL;
+        
         if ($avg > 3000) {
             $avg = 0;
         } elseif ($avg > self::MAX) {
@@ -73,6 +75,8 @@ class BoilerLoad extends Core
         }
 
         $loadPercent = 100 - round($avg / (self::MAX - self::MIN) * 100);
+        
+        echo 'Load = ' . $loadPercent . PHP_EOL; 
         
         $sql = 'INSERT INTO ' . self::TABLE . ' (
                     `date`, 
@@ -83,7 +87,7 @@ class BoilerLoad extends Core
                     ' . (int)$loadPercent . '
                 )';
 
-
+//
         echo $sql . PHP_EOL;
 
         $stm = $this->getDb()->prepare($sql);
