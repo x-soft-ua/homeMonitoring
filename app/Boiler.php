@@ -12,13 +12,16 @@ class Boiler extends Core
     const COLUMN_INSIDE = 'temp_inside';
     const COLUMN_OUTSIDE = 'temp_outside';
     const COLUMN_BOILER_OUT = 'temp_out';
-    const COLUMN_BOILER_IN = 'temp_in';
+    const COLUMN_BUFFER_BOTTOM = 'buffer_bottom';
+    const COLUMN_BUFFER_TOP= 'buffer_top';
+    
 
     private static $sensorMap = [
-        self::COLUMN_INSIDE => 0,
-        self::COLUMN_BOILER_OUT => 3,
-        self::COLUMN_BOILER_IN => 2,
-        self::COLUMN_OUTSIDE => 1,
+        self::COLUMN_INSIDE => 1,
+        self::COLUMN_BOILER_OUT => 4,
+        self::COLUMN_BUFFER_BOTTOM => 3,
+        self::COLUMN_BUFFER_TOP => 0,
+        self::COLUMN_OUTSIDE => 2,
     ];
     public function execute($topic = '', $msg = '')
     {

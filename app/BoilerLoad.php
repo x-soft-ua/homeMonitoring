@@ -2,8 +2,6 @@
 
 namespace app;
 
-use Bluerhinos\phpMQTT;
-use karpy47\PhpMqttClient\MQTTClient;
 
 class BoilerLoad extends Core
 {
@@ -28,8 +26,7 @@ class BoilerLoad extends Core
      */
     public function execute($topic = '', $msg = '')
     {
-        return;
-        
+
         try {
             $stm = $this->getDb()->query('SELECT temp_out FROM temp_boiler ORDER BY date DESC LIMIT 1');
             if ($stm) {
@@ -73,10 +70,10 @@ class BoilerLoad extends Core
         } elseif ($avg > self::MAX) {
             return;
         }
-
-        $loadPercent = 100 - round($avg / (self::MAX - self::MIN) * 100);
         
-        echo 'Load = ' . $loadPercent . PHP_EOL; 
+        //$load = 100 - round($avg / (self::MAX - self::MIN) * 100);
+        
+        echo 'Cur = ' . $value . '; Avg = ' . $avg . PHP_EOL; 
         
         $sql = 'INSERT INTO ' . self::TABLE . ' (
                     `date`, 
@@ -84,7 +81,7 @@ class BoilerLoad extends Core
                 ) 
                 VALUES (
                     NOW(), 
-                    ' . (int)$loadPercent . '
+                    ' . (int)$avg . '
                 )';
 
 //

@@ -7,7 +7,9 @@
         }
     ],
     "require": {
-        "ext-pdo_mysql": "*"
+        "ext-pdo_mysql": "*",
+        "bluerhinos/phpmqtt": "dev-master",
+        "karpy47/php-mqtt-client": "dev-master"
     },
     "autoload": {
         "psr-4": {
